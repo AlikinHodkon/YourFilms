@@ -5,6 +5,7 @@ import Profile from "./pages/Profile.tsx";
 import Login from "./pages/Login.tsx";
 import FilmData from "./pages/FilmData.tsx";
 import Admin from "./pages/Admin.tsx";
+import Registration from "./pages/Registration.tsx";
 
 function App() {
     const router = createBrowserRouter([
@@ -27,6 +28,10 @@ function App() {
         {
             path: "/login",
             element: <Login />
+        },
+        {
+            path: "/registration",
+            element: <Registration />
         },
         {
             path: "/admin",

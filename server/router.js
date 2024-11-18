@@ -5,7 +5,8 @@ const router = new Router();
 
 router.get("/films", filmsController.getFilms);
 router.get("/films/:id", filmsController.getFilm);
-router.get("/reviews/:id", filmsController.getReviews)
+router.get("/reviews/:id", filmsController.getReviews);
+router.post("/profile", userController.profile);
 router.post("/auth", userController.login);
 router.post("/registration", userController.registration);
 

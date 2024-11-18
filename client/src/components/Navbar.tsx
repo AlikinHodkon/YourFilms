@@ -6,7 +6,7 @@ export default function Navbar() {
           <li className={"hover:text-[#01e054]"}><a href={"/"}>Home</a></li>
           <li className={"hover:text-[#01e054]"}><a href={"/watch"}>Watch</a></li>
           <li className={"hover:text-[#01e054]"}>Price</li>
-          <li className={"hover:text-[#01e054]"}><a href={"/profile"}>Profile</a></li>
+          <li className={"hover:text-[#01e054]"}><a href={"/login"}>Profile</a></li>
         </ul>
       </div>
     </div>

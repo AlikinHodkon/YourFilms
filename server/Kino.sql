@@ -83,3 +83,11 @@ INSERT INTO Пароли (id_пользователя, пароль) VALUES
 (13, 'lock'),
 (14, 'open'),
 (15, 'safe');
+
+CREATE SEQUENCE users
+	INCREMENT 1
+	START 16
+
+CREATE SEQUENCE password
+	INCREMENT 1
+	START 16
