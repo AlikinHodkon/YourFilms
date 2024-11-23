@@ -8,6 +8,9 @@ import Review from "../components/Review.tsx";
 function FilmData() {
     const [filmData, setFilmData] = useState<IFilm | null>(null);
     const [reviews, setReviews] = useState<IReview[] | []>([]);
+    const [userData, setUserData] = useState(null);
+    const [text, setText] = useState("");
+    const [rating, setRating] = useState(1);
     const params = useParams();
     useEffect(() => {
         axios.get(`http://localhost:5000/api/films/${params.id}`).then((response) => {
@@ -16,7 +19,17 @@ function FilmData() {
         axios.get(`http://localhost:5000/api/reviews/${params.id}`).then((response) => {
             setReviews(response.data);
         })
+        axios.post("http://localhost:5000/api/profile", {"email": JSON.parse(localStorage.getItem("email"))}).then((response) => {
+            setUserData(response.data);
+        })
     }, []);
+    function handleClick(){
+        axios.post("http://localhost:5000/api/reviews", {"id_user": userData?.id_пользователя, "id_film": filmData?.id_фильма, "text": text, "rating": rating}).then(() => {
+            axios.get(`http://localhost:5000/api/reviews/${params.id}`).then((response) => {
+                setReviews(response.data);
+            })
+        })
+    }
     return (
         <div className={"bg-[#14181c]"}>
             <Navbar />
@@ -43,7 +56,44 @@ function FilmData() {
                     <hr className={"bg-[#14181c] mt-5 mb-5"}/>
                     <section className={"flex flex-col text-[24px]"}>
                         <h2 className={"text-center"}>Reviews</h2>
-                        {reviews.map((review) => <Review review={review} />)}
+                        {reviews.map((review) => <Review key={review.id_отзыва} review={review} />)}
+                        <div className={"flex flex-col mt-5 "}>
+                            <div className={"flex flex-col p-3 border-2 rounded"}>
+                                <div className={"flex"}>
+                                    <div className={"flex flex-col"}>
+                                        <h3 className={"text-[16px] text-[#647586]"}>Review by
+                                            <span className={"text-[#aabbcc]"}> {userData?.фамилия} {userData?.имя}</span>
+                                        </h3>
+                                        <p className={"text-[12px] text-[#647586]"}>{}</p>
+                                    </div>
+                                    <div className={`ml-auto border flex justify-center items-center`}>
+                                        <select onChange={(e) => setRating(parseInt(e.target.value))}>
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <textarea onChange={(e) => setText(e.target.value)} className={"text-[16px] mt-2 text-[#97a8b9] bg-[#283038]"}></textarea>
+                                <div className={"flex justify-center mt-3"}>
+                                    <button onClick={handleClick}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             strokeWidth={1.5}
+                                             stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round"
+                                                  d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </div>
             </div>

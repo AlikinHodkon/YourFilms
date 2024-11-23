@@ -6,7 +6,7 @@ interface ReviewProps{
 
 function Review(props: ReviewProps) {
     return (
-        <div className={"flex flex-col p-3 border-2 rounded"}>
+        <div className={"flex flex-col p-3 border-2 rounded mt-2"}>
             <div className={"flex"}>
                 <div className={"flex flex-col"}>
                     <h3 className={"text-[16px] text-[#647586]"}>Review by <span className={"text-[#aabbcc]"}>{props.review.фамилия} {props.review.имя}</span></h3>
