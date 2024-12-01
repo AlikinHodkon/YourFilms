@@ -99,3 +99,26 @@ CREATE SEQUENCE reviews
 CREATE SEQUENCE films
     INCREMENT 1
     START 16
+
+CREATE ROLE admin;
+CREATE ROLE watcher;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Фильмы" TO admin;
+GRANT SELECT ON "Фильмы" TO watcher;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Пользователи" TO admin;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Отзывы" TO admin;
+GRANT SELECT, INSERT ON "Отзывы" TO watcher;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Режиссеры" TO admin;
+GRANT SELECT ON "Режиссеры" TO watcher;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Просмотры" TO admin;
+GRANT SELECT, INSERT ON "Просмотры" TO watcher;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Жанр" TO admin;
+GRANT SELECT ON "Жанр" TO watcher;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Подписки" TO admin;
+GRANT SELECT, UPDATE ON "Подписки" TO watcher;

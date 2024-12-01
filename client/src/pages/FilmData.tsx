@@ -57,7 +57,7 @@ function FilmData() {
                     <section className={"flex flex-col text-[24px]"}>
                         <h2 className={"text-center"}>Reviews</h2>
                         {reviews.map((review) => <Review key={review.id_отзыва} review={review} />)}
-                        <div className={"flex flex-col mt-5 "}>
+                        <div className={`${localStorage.getItem("email") ? "flex" : "hidden"} flex-col mt-5`}>
                             <div className={"flex flex-col p-3 border-2 rounded"}>
                                 <div className={"flex"}>
                                     <div className={"flex flex-col"}>

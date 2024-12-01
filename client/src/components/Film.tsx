@@ -4,7 +4,7 @@ import axios from "axios";
 
 interface FilmProps{
     film: IFilm,
-    setFilms: () => void
+    setFilms: (films: IFilm[]) => void
 }
 
 function Film(props: FilmProps) {
