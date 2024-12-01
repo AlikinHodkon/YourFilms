@@ -69,7 +69,7 @@ function FilmList() {
             </div>
             <div className={"flex flex-wrap justify-between"}>
                 {films.map((film: IFilm) => <Film key={film.id_фильма} film={film} setFilms={setFilms}/>)}
-                <button onClick={showForm} className={"border-2 border-dotted border-orange-600 h-[60vh] w-[20vw] flex justify-center items-center mt-2"}>
+                <button onClick={showForm} className={`border-2 border-dotted border-orange-600 h-[60vh] w-[20vw] justify-center items-center mt-2 ${localStorage.getItem('email') === 'root' ? "flex" : "hidden"}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                         stroke="currentColor" className="size-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>

@@ -10,6 +10,7 @@ router.get("/genres", filmsController.getGenres);
 router.get("/directors", filmsController.getDirectors);
 router.post("/profile", userController.profile);
 router.post("/auth", userController.login);
+router.post("/admin", userController.adminLogin);
 router.post("/registration", userController.registration);
 router.post("/reviews", filmsController.addReview);
 router.post("/films", filmsController.addFilm)

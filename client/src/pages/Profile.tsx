@@ -5,7 +5,7 @@ import axios from "axios";
 function Profile() {
     const [userData, setUserData] = useState(null);
     useEffect(() => {
-        axios.post("http://localhost:5000/api/profile", {"email": JSON.parse(localStorage.getItem("email"))}).then((response) => {
+        axios.post("http://localhost:5000/api/profile", {"email": localStorage.getItem("email")}).then((response) => {
             setUserData(response.data);
         })
         }, []);
@@ -21,7 +21,7 @@ function Profile() {
                         <h1>Email: {userData?.электронная_почта}</h1>
                         <h1>Имя: {userData?.имя}</h1>
                         <h1>Фамилия: {userData?.фамилия}</h1>
-                        <h1>Дата регистрации: {userData?.дата_регистрации.toString().substring(0, 10)}</h1>
+                        <h1>Дата регистрации: {userData?.дата_регистрации.substring(0, 10)}</h1>
                     </div>
                 </div>
                 <div className="flex flex-col w-3/4 ml-5 mr-5">

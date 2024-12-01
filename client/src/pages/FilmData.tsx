@@ -19,7 +19,7 @@ function FilmData() {
         axios.get(`http://localhost:5000/api/reviews/${params.id}`).then((response) => {
             setReviews(response.data);
         })
-        axios.post("http://localhost:5000/api/profile", {"email": JSON.parse(localStorage.getItem("email"))}).then((response) => {
+        axios.post("http://localhost:5000/api/profile", {"email": localStorage.getItem("email")}).then((response) => {
             setUserData(response.data);
         })
     }, []);

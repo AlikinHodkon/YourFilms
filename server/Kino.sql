@@ -107,6 +107,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON "Фильмы" TO admin;
 GRANT SELECT ON "Фильмы" TO watcher;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON "Пользователи" TO admin;
+GRANT INSERT ON "Пользователи" to watcher;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON "Отзывы" TO admin;
 GRANT SELECT, INSERT ON "Отзывы" TO watcher;
@@ -122,3 +123,6 @@ GRANT SELECT ON "Жанр" TO watcher;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON "Подписки" TO admin;
 GRANT SELECT, UPDATE ON "Подписки" TO watcher;
+
+CREATE USER root WITH PASSWORD 'root';
+GRANT admin TO root;

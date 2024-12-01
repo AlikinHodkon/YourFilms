@@ -11,9 +11,11 @@ function LoginForm() {
     }, []);
     function buttonHandler(){
         axios.post("http://localhost:5000/api/auth", {"email": email, "password": password}).then((response) => {
-            localStorage.setItem("email", JSON.stringify(response.data.электронная_почта));
+            localStorage.setItem("email", response.data.электронная_почта);
         });
-        navigate("/profile");
+        if (localStorage.getItem("email")){
+            navigate("/profile");
+        }
     }
     return (
         <div className={"flex justify-center"}>

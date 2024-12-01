@@ -32,6 +32,14 @@ class userController{
 
         }
     }
+    async adminLogin(req, res){
+        try{
+            const {name, password} = req.body;
+            if (name === 'root' && password === 'root') res.json('root');
+        }catch (error){
+
+        }
+    }
     async profile(req, res){
         try {
             const {email} = req.body;
