@@ -81,6 +81,15 @@ class filmsController{
 
         }
     }
+    async deleteReview(req, res){
+        try{
+            const id = req.params.id;
+            await db.query(`DELETE FROM "Отзывы" WHERE "id_отзыва" = $1`, [id])
+            res.json()
+        }catch(error){
+            console.log(error);
+        }
+    }
 }
 
 module.exports = new filmsController();

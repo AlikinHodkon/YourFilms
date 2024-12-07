@@ -15,5 +15,6 @@ router.post("/registration", userController.registration);
 router.post("/reviews", filmsController.addReview);
 router.post("/films", filmsController.addFilm)
 router.delete("/films/:id",filmsController.deleteFilm);
+router.delete("/reviews/:id", filmsController.deleteReview)
 
 module.exports = router;
