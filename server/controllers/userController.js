@@ -1,6 +1,5 @@
 const db = require("../db");
 const bcrypt = require('bcrypt')
-const {compare} = require("bcrypt");
 
 class userController{
     async registration(req, res){
@@ -46,6 +45,25 @@ class userController{
             const userData = await db.query(`SELECT * FROM "Пользователи" WHERE "электронная_почта" = $1`,[email]);
             res.json(userData.rows[0]);
         }catch (error) {
+            
+        }
+    }
+    async addWatch(req, res){
+        try {
+            const {email, id} = req.body;
+            const userData = await db.query(`SELECT * FROM "Пользователи" WHERE "электронная_почта" = $1`,[email]);
+            await db.query(`INSERT INTO "Просмотры" ("id_пользователя", "id_фильма", "дата_просмотра", "время_просмотра") VALUES ($1, $2, CURRENT_DATE, CURRENT_TIME)`, [userData.rows[0].id_пользователя, id])
+            res.json()
+        } catch (error) {
+            
+        }
+    }
+    async getWatch(req, res){
+        try {
+            const id = req.params.id;
+            const watchData = await db.query(`SELECT * FROM "Просмотры" WHERE "id_пользователя" = $1 LIMIT 3`, [id])
+            res.json(watchData)
+        } catch (error) {
             
         }
     }

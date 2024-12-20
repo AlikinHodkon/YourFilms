@@ -1,6 +1,10 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Navbar() {
+  const navigate = useNavigate()
   function handleClick(){
     localStorage.removeItem('email');
+    navigate('/')
   }
   return (
     <div className="bg-black text-white h-10">

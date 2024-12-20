@@ -10,6 +10,7 @@ interface FilmProps{
 function Film(props: FilmProps) {
     const navigate = useNavigate();
     function handleClick(){
+        axios.post('http://localhost:5000/api/watch', {"email": localStorage.getItem("email"), "id": props.film.id_фильма})
         navigate(`/watch/${props.film.id_фильма}`);
     }
     async function deleteFilm(e){

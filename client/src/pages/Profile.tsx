@@ -4,10 +4,13 @@ import axios from "axios";
 
 function Profile() {
     const [userData, setUserData] = useState(null);
+    const [watchData, setWatchData] = useState(null);
     useEffect(() => {
         axios.post("http://localhost:5000/api/profile", {"email": localStorage.getItem("email")}).then((response) => {
-            setUserData(response.data);
-        })
+                setUserData(response.data);
+                axios.get(`http://localhost:5000/api/watch/${response.data.id_пользователя}`).then((response) => setWatchData(response.data.rows))
+                }
+            )
         }, []);
     return (
         <div className="w-full">
@@ -35,21 +38,18 @@ function Profile() {
                         <h1 className="text-center text-[40px]"></h1>
                         <div className={`flex justify-between ml-5 mr-5`}>
                             <p>1</p>
-                            <p></p>
-                            <p></p>
-                            <p></p>
+                            <p>{watchData?.[0]?.время_просмотра.substring(0, 8)}</p>
+                            <p>{watchData?.[0]?.дата_просмотра.substring(0, 10)}</p>
                         </div>
                         <div className={`flex justify-between ml-5 mr-5`}>
                             <p>2</p>
-                            <p></p>
-                            <p></p>
-                            <p></p>
+                            <p>{watchData?.[1]?.время_просмотра.substring(0, 8)}</p>
+                            <p>{watchData?.[1]?.дата_просмотра.substring(0, 10)}</p>
                         </div>
                         <div className={`flex justify-between mb-5 ml-5 mr-5`}>
                             <p>3</p>
-                            <p></p>
-                            <p></p>
-                            <p></p>
+                            <p>{watchData?.[1]?.время_просмотра.substring(0, 8)}</p>
+                            <p>{watchData?.[1]?.дата_просмотра.substring(0, 10)}</p>
                         </div>
                     </div>
                 </div>
