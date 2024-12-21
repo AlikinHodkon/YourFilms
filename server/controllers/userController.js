@@ -61,7 +61,8 @@ class userController{
     async getWatch(req, res){
         try {
             const id = req.params.id;
-            const watchData = await db.query(`SELECT * FROM "Просмотры" WHERE "id_пользователя" = $1 LIMIT 3`, [id])
+            const watchData = await db.query(`SELECT * FROM "Просмотры" JOIN "Фильмы" ON "Просмотры"."id_фильма" = "Фильмы"."id_фильма" WHERE "id_пользователя" = $1 ORDER BY "id_просмотра" DESC LIMIT 3`, [id])
+            console.log(watchData);
             res.json(watchData)
         } catch (error) {
             

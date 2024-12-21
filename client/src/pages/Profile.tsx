@@ -8,9 +8,10 @@ function Profile() {
     useEffect(() => {
         axios.post("http://localhost:5000/api/profile", {"email": localStorage.getItem("email")}).then((response) => {
                 setUserData(response.data);
-                axios.get(`http://localhost:5000/api/watch/${response.data.id_пользователя}`).then((response) => setWatchData(response.data.rows))
-                }
-            )
+                axios.get(`http://localhost:5000/api/watch/${response.data.id_пользователя}`).then((response) => {
+                    setWatchData(response.data.rows)
+                });
+                })
         }, []);
     return (
         <div className="w-full">
@@ -38,18 +39,21 @@ function Profile() {
                         <h1 className="text-center text-[40px]"></h1>
                         <div className={`flex justify-between ml-5 mr-5`}>
                             <p>1</p>
-                            <p>{watchData?.[0]?.время_просмотра.substring(0, 8)}</p>
-                            <p>{watchData?.[0]?.дата_просмотра.substring(0, 10)}</p>
+                            <p className="w-1/4">{watchData?.[0]?.название}</p>
+                            <p className="w-1/4">{watchData?.[0]?.время_просмотра.substring(0, 8)}</p>
+                            <p className="w-1/4">{watchData?.[0]?.дата_просмотра.substring(0, 10)}</p>
                         </div>
                         <div className={`flex justify-between ml-5 mr-5`}>
                             <p>2</p>
-                            <p>{watchData?.[1]?.время_просмотра.substring(0, 8)}</p>
-                            <p>{watchData?.[1]?.дата_просмотра.substring(0, 10)}</p>
+                            <p className="w-1/4">{watchData?.[1]?.название}</p>
+                            <p className="w-1/4">{watchData?.[1]?.время_просмотра.substring(0, 8)}</p>
+                            <p className="w-1/4">{watchData?.[1]?.дата_просмотра.substring(0, 10)}</p>
                         </div>
                         <div className={`flex justify-between mb-5 ml-5 mr-5`}>
                             <p>3</p>
-                            <p>{watchData?.[1]?.время_просмотра.substring(0, 8)}</p>
-                            <p>{watchData?.[1]?.дата_просмотра.substring(0, 10)}</p>
+                            <p className="w-1/4">{watchData?.[2]?.название}</p>
+                            <p className="w-1/4">{watchData?.[2]?.время_просмотра.substring(0, 8)}</p>
+                            <p className="w-1/4">{watchData?.[2]?.дата_просмотра.substring(0, 10)}</p>
                         </div>
                     </div>
                 </div>
