@@ -1,130 +1,109 @@
-CREATE TABLE "Фильмы" (
-  "id_фильма" int PRIMARY KEY,
-  "название" varchar NOT NULL,
-  "id_жанра" int,
-  "дата_выпуска" date,
-  "id_режиссера" int,
-  "рейтинг" float CHECK (рейтинг >= 0 AND рейтинг <= 10),
-  FOREIGN KEY ("id_жанра") REFERENCES "Жанр"("id_жанра"),
-  FOREIGN KEY ("id_режиссера") REFERENCES "Режиссеры"("id_режиссера")
+-- Create database
+CREATE DATABASE online_cinema;
+\c online_cinema;
+
+-- Create "Genre" table
+CREATE TABLE "Genre" (
+  "genre_id" SERIAL PRIMARY KEY,
+  "name" VARCHAR(255) NOT NULL,
+  "description" TEXT
 );
 
-CREATE TABLE "Пользователи" (
-  "id_пользователя" int PRIMARY KEY,
-  "имя" varchar NOT NULL,
-  "фамилия" varchar NOT NULL,
-  "электронная_почта" varchar UNIQUE NOT NULL,
-  "дата_регистрации" date DEFAULT CURRENT_DATE
+-- Create "Directors" table
+CREATE TABLE "Directors" (
+  "director_id" SERIAL PRIMARY KEY,
+  "first_name" VARCHAR(100) NOT NULL,
+  "last_name" VARCHAR(100) NOT NULL,
+  "birth_date" DATE,
+  "biography" TEXT
 );
 
-CREATE TABLE "Просмотры" (
-  "id_просмотра" int PRIMARY KEY,
-  "id_пользователя" int,
-  "id_фильма" int,
-  "дата_просмотра" date NOT NULL,
-  "время_просмотра" time NOT NULL,
-  FOREIGN KEY ("id_пользователя") REFERENCES "Пользователи"("id_пользователя") ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY ("id_фильма") REFERENCES "Фильмы"("id_фильма") ON DELETE CASCADE
+-- Create "Movies" table
+CREATE TABLE "Movies" (
+  "movie_id" SERIAL PRIMARY KEY,
+  "title" VARCHAR(255) NOT NULL,
+  "genre_id" INT REFERENCES "Genre"("genre_id"),
+  "release_date" DATE,
+  "director_id" INT REFERENCES "Directors"("director_id"),
+  "rating" DECIMAL(3,1) CHECK (rating >= 0 AND rating <= 10)
 );
 
-CREATE TABLE "Отзывы" (
-  "id_отзыва" int PRIMARY KEY,
-  "id_фильма" int,
-  "id_пользователя" int,
-  "текст" text NOT NULL,
-  "оценка" int CHECK (оценка >= 1 AND оценка <= 10),
-  "дата_отзыва" date DEFAULT CURRENT_DATE,
-  FOREIGN KEY ("id_фильма") REFERENCES "Фильмы"("id_фильма") ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY ("id_пользователя") REFERENCES "Пользователи"("id_пользователя") ON DELETE CASCADE ON UPDATE CASCADE
+-- Create "Users" table
+CREATE TABLE "Users" (
+  "user_id" SERIAL PRIMARY KEY,
+  "first_name" VARCHAR(100) NOT NULL,
+  "last_name" VARCHAR(100) NOT NULL,
+  "email" VARCHAR(255) UNIQUE NOT NULL,
+  "registration_date" DATE DEFAULT CURRENT_DATE
 );
 
-CREATE TABLE "Подписки" (
-  "id_подписки" int PRIMARY KEY,
-  "id_пользователя" int,
-  "тип_подписки" varchar NOT NULL,
-  "дата_начала" date DEFAULT CURRENT_DATE,
-  "дата_окончания" date,
-  FOREIGN KEY ("id_пользователя") REFERENCES "Пользователи"("id_пользователя") ON DELETE CASCADE ON UPDATE CASCADE
+-- Create "WatchHistory" table
+CREATE TABLE "WatchHistory" (
+  "watch_id" SERIAL PRIMARY KEY,
+  "user_id" INT REFERENCES "Users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "movie_id" INT REFERENCES "Movies"("movie_id") ON DELETE CASCADE,
+  "watch_date" DATE NOT NULL,
+  "watch_time" TIME NOT NULL
 );
 
-CREATE TABLE "Жанр" (
-  "id_жанра" int PRIMARY KEY,
-  "название" varchar NOT NULL,
-  "описание" text
+-- Create "Reviews" table
+CREATE TABLE "Reviews" (
+  "review_id" SERIAL PRIMARY KEY,
+  "movie_id" INT REFERENCES "Movies"("movie_id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "user_id" INT REFERENCES "Users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "text" TEXT NOT NULL,
+  "rating" INT CHECK (rating >= 1 AND rating <= 10),
+  "review_date" DATE DEFAULT CURRENT_DATE
 );
 
-CREATE TABLE "Режиссеры" (
-  "id_режиссера" int PRIMARY KEY,
-  "имя" varchar NOT NULL,
-  "фамилия" varchar NOT NULL,
-  "дата_рождения" date,
-  "биография" text
+-- Create "Subscriptions" table
+CREATE TABLE "Subscriptions" (
+  "subscription_id" SERIAL PRIMARY KEY,
+  "user_id" INT REFERENCES "Users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "subscription_type" VARCHAR(50) NOT NULL,
+  "start_date" DATE DEFAULT CURRENT_DATE,
+  "end_date" DATE
 );
 
-CREATE TABLE "Пароли" (
-  "id_пользователя" int PRIMARY KEY,
-  "пароль" varchar NOT NULL,
-  FOREIGN KEY ("id_пользователя") REFERENCES "Пользователи"("id_пользователя") ON DELETE CASCADE ON UPDATE CASCADE
+-- Create "Passwords" table
+CREATE TABLE "Passwords" (
+  "user_id" INT PRIMARY KEY REFERENCES "Users"("user_id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "password" VARCHAR(255) NOT NULL
 );
 
-INSERT INTO Пароли (id_пользователя, пароль) VALUES
-(1, 'abcd'),
-(2, '1234'),
-(3, 'pass'),
-(4, 'word'),
-(5, 'qwer'),
-(6, 'asdf'),
-(7, 'zxcv'),
-(8, '0987'),
-(9, '5678'),
-(10, 'home'),
-(11, 'base'),
-(12, 'test'),
-(13, 'lock'),
-(14, 'open'),
-(15, 'safe');
+-- Create sequences
+CREATE SEQUENCE users_seq INCREMENT 1 START 16;
+CREATE SEQUENCE password_seq INCREMENT 1 START 16;
+CREATE SEQUENCE reviews_seq INCREMENT 1 START 16;
+CREATE SEQUENCE movies_seq INCREMENT 1 START 16;
+CREATE SEQUENCE watch_seq INCREMENT 1 START 12;
 
-CREATE SEQUENCE users
-	INCREMENT 1
-	START 16
-
-CREATE SEQUENCE password
-	INCREMENT 1
-	START 16
-
-CREATE SEQUENCE reviews
-	INCREMENT 1
-	START 16
-
-CREATE SEQUENCE films
-    INCREMENT 1
-    START 16
-
-CREATE SEQUENCE watch INCREMENT 1 START 12;
-
+-- Create roles
 CREATE ROLE admin;
-CREATE ROLE watcher;
+CREATE ROLE viewer;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON "Фильмы" TO admin;
-GRANT SELECT ON "Фильмы" TO watcher;
+-- Grant permissions to roles
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Movies" TO admin;
+GRANT SELECT ON "Movies" TO viewer;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON "Пользователи" TO admin;
-GRANT INSERT ON "Пользователи" to watcher;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Users" TO admin;
+GRANT INSERT ON "Users" TO viewer;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON "Отзывы" TO admin;
-GRANT SELECT, INSERT ON "Отзывы" TO watcher;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Reviews" TO admin;
+GRANT SELECT, INSERT ON "Reviews" TO viewer;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON "Режиссеры" TO admin;
-GRANT SELECT ON "Режиссеры" TO watcher;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Directors" TO admin;
+GRANT SELECT ON "Directors" TO viewer;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON "Просмотры" TO admin;
-GRANT SELECT, INSERT ON "Просмотры" TO watcher;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "WatchHistory" TO admin;
+GRANT SELECT, INSERT ON "WatchHistory" TO viewer;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON "Жанр" TO admin;
-GRANT SELECT ON "Жанр" TO watcher;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Genre" TO admin;
+GRANT SELECT ON "Genre" TO viewer;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON "Подписки" TO admin;
-GRANT SELECT, UPDATE ON "Подписки" TO watcher;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "Subscriptions" TO admin;
+GRANT SELECT, UPDATE ON "Subscriptions" TO viewer;
 
-CREATE USER root WITH PASSWORD 'root';
-GRANT admin TO root;
+-- Create admin user and assign role
+CREATE USER cinema_admin WITH PASSWORD 'secure_password';
+GRANT admin TO cinema_admin;

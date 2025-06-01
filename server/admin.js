@@ -5,7 +5,7 @@ const pool = new Pool({
     password: "root",
     host: 'localhost',
     port: 5432,
-    database: 'online_kino'
+    database: 'online_cinema'
 });
 
 module.exports = pool;

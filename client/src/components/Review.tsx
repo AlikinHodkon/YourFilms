@@ -1,23 +1,37 @@
 import axios from "axios";
-import {IReview} from "../types.ts";
+import { IReview } from "../types.ts";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import "./Review.css";
+import { useTranslation } from "react-i18next";
 
-interface ReviewProps{
-    review: IReview
+interface ReviewProps {
+    review: IReview;
+    setReviews: (reviews: IReview[]) => void;
 }
 
-function Review(props: ReviewProps) {
-    function handleButton(){
-        axios.delete(`http://localhost:5000/api/reviews/${props.review.id_отзыва}`);
+function Review({ review, setReviews }: ReviewProps) {
+    const { t } = useTranslation();
+
+    function handleButton() {
+        axios.delete(`http://localhost:5000/api/reviews/${review.review_id}`).then(() => {
+            setReviews(prevReviews => prevReviews.filter(r => r.review_id !== review.review_id));
+        }).catch(error => console.error(t("delete_error"), error));
     }
+
     return (
-        <div className={"flex flex-col p-3 border-2 rounded mt-2"}>
-            <div className={"flex"}>
-                <div className={"flex flex-col"}>
-                    <h3 className={"text-[16px] text-[#647586]"}>Review by <span className={"text-[#aabbcc]"}>{props.review.фамилия} {props.review.имя}</span></h3>
-                    <p className={"text-[12px] text-[#647586]"}>{props.review.дата_отзыва.substring(0,10).replaceAll("-", ".")}</p>
+        <div className="flex flex-col p-3 border-2 rounded mt-2 bg-[#1d242b]">
+            <div className="flex">
+                <div className="flex flex-col">
+                    <h3 className="text-[16px] text-[#647586]">
+                        {t("review_by")} <span className="text-[#aabbcc]">{review.last_name} {review.first_name}</span>
+                    </h3>
+                    <p className="text-[12px] text-[#647586]">
+                        {review.review_date ? review.review_date.substring(0, 10).replaceAll("-", ".") : t("date_missing")}
+                    </p>
                 </div>
-                <div className={`ml-auto border rounded-3xl w-[2vw] h-[2vw] text-white flex justify-center items-center ${props.review.оценка > 6 ? "bg-green-500" : props.review.оценка > 3 ? "bg-amber-500" : "bg-red-600"}`}>
-                    <h3>{props.review.оценка}</h3>
+                <div className={`ml-auto border rounded-3xl w-[2vw] h-[2vw] text-white flex justify-center items-center ${review.rating > 6 ? "bg-green-500" : review.rating > 3 ? "bg-amber-500" : "bg-red-600"}`}>
+                    <h3>{review.rating}</h3>
                 </div>
             </div>
             <button onClick={handleButton}>
@@ -25,7 +39,13 @@ function Review(props: ReviewProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
             </button>
-            <p className={"text-[16px] mt-2 text-[#97a8b9]"}>{props.review.текст}</p>
+            <div className="quill-container text-[16px] mt-2 text-[#97a8b9]">
+                <ReactQuill
+                    value={review.text || t("text_missing")}
+                    readOnly={true}
+                    theme="bubble"
+                />
+            </div>
         </div>
     );
 }

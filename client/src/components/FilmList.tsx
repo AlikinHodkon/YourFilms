@@ -11,64 +11,60 @@ function FilmList() {
     const [date, setDate] = useState("");
     const [rating, setRating] = useState("1");
     const [genre, setGenre] = useState("Drama");
-    const [director, setDirector] = useState("Sergei Eisenstein");
+    const [director, setDirector] = useState();
     const [form, setForm] = useState(false);
+
     useEffect(() => {
         axios.get("http://localhost:5000/api/films").then((response) => {
             setFilms(response.data);
-        })
+        });
         axios.get("http://localhost:5000/api/genres").then((response) => {
             setGenres(response.data);
-        })
+        });
         axios.get("http://localhost:5000/api/directors").then((response) => {
             setDirectors(response.data);
-        })
+        });
     }, []);
-    async function addFilm(e){
+
+    async function addFilm(e) {
         e.preventDefault();
         setForm(false);
-        await axios.post("http://localhost:5000/api/films", {"name": name, "date": date, "rating": rating, "genre": genre, "director": director});
+        await axios.post("http://localhost:5000/api/films", {
+            "name": name, 
+            "date": date, 
+            "rating": rating, 
+            "genre": genre, 
+            "director": director
+        });
         await axios.get("http://localhost:5000/api/films").then((response) => {
             setFilms(response.data);
-        })
+        });
     }
-    function handleInput(e){
-        switch (e.target.name){
-            case "name":{
-                setName(e.target.value);
-                break;
-            }
-            case "date":{
-                setDate(e.target.value);
-                break;
-            }
-            case "rating":{
-                setRating(e.target.value);
-                break;
-            }
-            case "director":{
-                setDirector(e.target.value);
-                break;
-            }
-            case "genre":{
-                setGenre(e.target.value);
-            }
+
+    function handleInput(e) {
+        switch (e.target.name) {
+            case "name": setName(e.target.value); break;
+            case "date": setDate(e.target.value); break;
+            case "rating": setRating(e.target.value); break;
+            case "director": setDirector(e.target.value); break;
+            case "genre": setGenre(e.target.value); break;
         }
     }
-    function showForm(){
-        const visible = !form;
-        setForm(visible);
+
+    function showForm() {
+        setForm(!form);
     }
+
     return (
         <>
             <div className="flex justify-center">
-                <button onClick={() => setFilms([...films].sort((film, film2) => film.id_жанра - film2.id_жанра))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by genre</button>
-                <button onClick={() => setFilms([...films].sort((film, film2) => film.название.localeCompare(film2.название)))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by name</button>
-                <button onClick={() => setFilms([...films].sort((film, film2) => film.id_режиссера - film2.id_режиссера))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by director</button>
-                <button onClick={() => setFilms([...films].sort((film, film2) => film.id_фильма - film2.id_фильма))} className="border bg-orange-600 p-2 w-[10%]">Reset</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.genre_id - b.genre_id))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by genre</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.title.localeCompare(b.title)))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by name</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.director_id - b.director_id))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by director</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.movie_id - b.movie_id))} className="border bg-orange-600 p-2 w-[10%]">Reset</button>
             </div>
             <div className={"flex flex-wrap justify-between"}>
-                {films.map((film: IFilm) => <Film key={film.id_фильма} film={film} setFilms={setFilms}/>)}
+                {films.map((film: IFilm) => <Film key={film.movie_id} film={film} setFilms={setFilms}/>)}
                 <button onClick={showForm} className={`border-2 border-dotted border-orange-600 h-[60vh] w-[20vw] justify-center items-center mt-2 ${localStorage.getItem('email') === 'root' ? "flex" : "hidden"}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                         stroke="currentColor" className="size-6">
@@ -87,28 +83,25 @@ function FilmList() {
                     <div className={"flex flex-col"}>
                         <label>Rating</label>
                         <select onChange={handleInput} name={"rating"} className={"border-2"}>
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                            <option>6</option>
-                            <option>7</option>
-                            <option>8</option>
-                            <option>9</option>
-                            <option>10</option>
+                            {[1,2,3,4,5,6,7,8,9,10].map(num => <option key={num}>{num}</option>)}
                         </select>
                     </div>
                     <div className={"flex flex-col"}>
                         <label>Director</label>
                         <select name={"director"} onChange={handleInput} className={"border-2"}>
-                            {directors.map((director) => <option key={director.id_режиссера}>{director.имя} {director.фамилия}</option>)}
+                            {directors.map((director) => (
+                                <option key={director.director_id}>
+                                    {director.first_name} {director.last_name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className={"flex flex-col"}>
                         <label>Genre</label>
                         <select name={"genre"} onChange={handleInput} className={"border-2"}>
-                            {genres.map((genre) => <option key={genre.id_жанра}>{genre.название}</option>)}
+                            {genres.map((genre) => (
+                                <option key={genre.genre_id}>{genre.name}</option>
+                            ))}
                         </select>
                     </div>
                     <button onClick={addFilm} className={"bg-orange-600 text-white rounded"}>Add</button>
