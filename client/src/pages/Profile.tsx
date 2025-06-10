@@ -1,12 +1,15 @@
 import Navbar from "../components/Navbar.tsx";
 import {useEffect, useState} from "react";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 function Profile() {
     const [userData, setUserData] = useState(null);
     const [watchData, setWatchData] = useState(null);
-    
+    const navigate = useNavigate();
+
     useEffect(() => {
+        if (!localStorage.getItem("email")) navigate("/login");
         axios.post("http://localhost:5000/api/profile", {
             "email": localStorage.getItem("email")
         }).then((response) => {

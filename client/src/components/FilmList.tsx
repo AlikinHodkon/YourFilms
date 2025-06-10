@@ -13,6 +13,7 @@ function FilmList() {
     const [genre, setGenre] = useState("Drama");
     const [director, setDirector] = useState();
     const [form, setForm] = useState(false);
+    const [image, setImage] = useState<File | null>(null);
 
     useEffect(() => {
         axios.get("http://localhost:5000/api/films").then((response) => {
@@ -29,16 +30,29 @@ function FilmList() {
     async function addFilm(e) {
         e.preventDefault();
         setForm(false);
-        await axios.post("http://localhost:5000/api/films", {
-            "name": name, 
-            "date": date, 
-            "rating": rating, 
-            "genre": genre, 
-            "director": director
-        });
-        await axios.get("http://localhost:5000/api/films").then((response) => {
+        
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('date', date);
+        formData.append('rating', rating);
+        formData.append('genre', genre);
+        formData.append('director', director);
+        if (image) {
+            formData.append('image', image);
+        }
+
+        try {
+            await axios.post("http://localhost:5000/api/films", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            const response = await axios.get("http://localhost:5000/api/films");
             setFilms(response.data);
-        });
+        } catch (error) {
+            console.error("Error adding film:", error);
+        }
     }
 
     function handleInput(e) {
@@ -55,6 +69,11 @@ function FilmList() {
         setForm(!form);
     }
 
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        setImage(file);
+    }
+
     return (
         <>
             <div className="flex justify-center">
@@ -63,9 +82,9 @@ function FilmList() {
                 <button onClick={() => setFilms([...films].sort((a, b) => a.director_id - b.director_id))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by director</button>
                 <button onClick={() => setFilms([...films].sort((a, b) => a.movie_id - b.movie_id))} className="border bg-orange-600 p-2 w-[10%]">Reset</button>
             </div>
-            <div className={"flex flex-wrap justify-between"}>
+            <div className={"flex flex-wrap gap-4 p-4"}>
                 {films.map((film: IFilm) => <Film key={film.movie_id} film={film} setFilms={setFilms}/>)}
-                <button onClick={showForm} className={`border-2 border-dotted border-orange-600 h-[60vh] w-[20vw] justify-center items-center mt-2 ${localStorage.getItem('email') === 'root' ? "flex" : "hidden"}`}>
+                <button onClick={showForm} className={`border-2 border-dotted border-orange-600 h-[60vh] w-[20vw] justify-center items-center mt-2 ${localStorage.getItem('email') === 'admin' ? "flex" : "hidden"}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                         stroke="currentColor" className="size-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -104,7 +123,11 @@ function FilmList() {
                             ))}
                         </select>
                     </div>
+                    <div>
+                        <input type="file" onChange={handleImageUpload} className="mt-2 text-white" />
+                    </div>
                     <button onClick={addFilm} className={"bg-orange-600 text-white rounded"}>Add</button>
+                    <button onClick={() => setForm(false)} className="border border-orange-600">Close</button>
                 </form>
             </div>
         </>

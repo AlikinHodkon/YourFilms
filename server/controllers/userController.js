@@ -5,23 +5,19 @@ class UserController {
     async registration(req, res) {
         try {
             const { name, surname, password, email } = req.body;
-            
-            // Validate input
+
             if (!name || !surname || !password || !email) {
                 return res.status(400).json({ error: "All fields are required" });
             }
 
-            // Check if user already exists
             const existingUser = await db.query('SELECT * FROM "Users" WHERE "email" = $1', [email]);
             if (existingUser.rows.length > 0) {
                 return res.status(409).json({ error: "User already exists" });
             }
 
-            // Hash password
             const salt = await bcrypt.genSalt(10);
             const passwordHash = await bcrypt.hash(password, salt);
 
-            // Create user
             const newUser = await db.query(
                 `INSERT INTO "Users" 
                 ("first_name", "last_name", "email", "registration_date") 
@@ -30,10 +26,9 @@ class UserController {
                 [name, surname, email]
             );
 
-            // Store password
             await db.query(
                 `INSERT INTO "Passwords" 
-                ("user_id", "password_hash") 
+                ("user_id", "password") 
                 VALUES($1, $2)`, 
                 [newUser.rows[0].user_id, passwordHash]
             );
@@ -54,14 +49,15 @@ class UserController {
     async login(req, res) {
         try {
             const { email, password } = req.body;
-            
+
             if (!email || !password) {
                 return res.status(400).json({ error: "Email and password are required" });
             }
 
-            // Get user
+            console.log(email);
+            
             const userData = await db.query(
-                'SELECT * FROM "Users" WHERE "email" = $1', 
+                'SELECT "user_id", "first_name", "last_name", "email" FROM "Users" WHERE "email" = $1',
                 [email]
             );
 
@@ -69,25 +65,28 @@ class UserController {
                 return res.status(401).json({ error: "Invalid credentials" });
             }
 
-            // Get password
+
             const passwordData = await db.query(
-                'SELECT "password_hash" FROM "Passwords" WHERE "user_id" = $1', 
+                'SELECT "password" FROM "Passwords" WHERE "user_id" = $1',
                 [userData.rows[0].user_id]
             );
 
-            // Compare passwords
-            const isValidPassword = await bcrypt.compare(
-                password, 
-                passwordData.rows[0].password_hash
-            );
-
-            if (!isValidPassword) {
+            if (passwordData.rows.length === 0) {
                 return res.status(401).json({ error: "Invalid credentials" });
             }
 
-            // Return user data without sensitive information
-            const { password_hash, ...user } = userData.rows[0];
-            res.json(user);
+            const isValidPassword = await bcrypt.compare(
+                password, 
+                passwordData.rows[0].password
+            )
+
+            if (!isValidPassword) {
+                return res.status(401).json({
+                    error: `Invalid credentials.`
+                });
+            }
+
+            res.json(userData.rows[0]);
 
         } catch (error) {
             console.error("Login error:", error);
@@ -99,8 +98,7 @@ class UserController {
         try {
             const { name, password } = req.body;
             
-            // This is just a basic example - in production use proper admin authentication
-            if (name === 'admin' && password === 'secure_password') {
+            if (name === 'admin' && password === 'root') {
                 return res.json({ role: 'admin' });
             }
             
@@ -114,7 +112,7 @@ class UserController {
 
     async profile(req, res) {
         try {
-            const { email } = req.body;
+            const { email, id } = req.body;
             
             if (!email) {
                 return res.status(400).json({ error: "Email is required" });
@@ -129,8 +127,7 @@ class UserController {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            // Remove sensitive data before sending
-            const { password_hash, ...user } = userData.rows[0];
+            const { password, ...user } = userData.rows[0];
             res.json(user);
 
         } catch (error) {
@@ -147,7 +144,6 @@ class UserController {
                 return res.status(400).json({ error: "Email and movie ID are required" });
             }
 
-            // Get user
             const userData = await db.query(
                 'SELECT "user_id" FROM "Users" WHERE "email" = $1', 
                 [email]
@@ -157,7 +153,6 @@ class UserController {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            // Record watch history
             await db.query(
                 `INSERT INTO "WatchHistory" 
                 ("user_id", "movie_id", "watch_date", "watch_time") 

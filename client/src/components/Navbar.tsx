@@ -12,11 +12,20 @@ export default function Navbar() {
 
   return (
     <div className="bg-black text-white h-10">
-      <div className="w-100 h-[100%] flex justify-center items-center">
-        <ul className="flex justify-between w-1/3 h-[100%] items-center">
+      <div className="w-full h-full flex justify-center items-center">
+        <ul className="flex justify-between w-1/2 h-full items-center">
           <li className="hover:text-orange-600"><a href="/">{t("home")}</a></li>
           <li className="hover:text-orange-600"><a href="/watch">{t("watch")}</a></li>
-          <li className="hover:text-orange-600">{t("price")}</li>
+          {localStorage.getItem("email") === "admin" && 
+            (
+              <li className="hover:text-orange-600"><a href="/genres">{t("genres")}</a></li>
+            )
+          }
+          {localStorage.getItem("email") === "admin" && 
+            (
+              <li className="hover:text-orange-600"><a href="/directors">{t("directors")}</a></li>
+            )
+          }
           <li className="hover:text-orange-600"><a href="/login">{t("profile")}</a></li>
           <li
             className={`hover:text-orange-600 ${localStorage.getItem("email") ? "block" : "hidden"}`}
@@ -24,14 +33,12 @@ export default function Navbar() {
           >
             {t("exit")}
           </li>
-          <select className="flex flex-col bg-black text-white">
+          <select className="bg-black text-white">
             <option onClick={() => i18n.changeLanguage("ru")} className="hover:text-orange-600">🇷🇺 Русский</option>
             <option onClick={() => i18n.changeLanguage("en")} className="hover:text-orange-600">🇬🇧 English</option>
           </select>
         </ul>
-
       </div>
     </div>
   );
 }
-

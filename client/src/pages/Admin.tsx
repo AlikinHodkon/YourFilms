@@ -9,10 +9,9 @@ function Admin() {
     function handleClick(e){
         e.preventDefault();
         axios.post("http://localhost:5000/api/admin", {"name": name, "password": password}).then((response) => {
-            console.log(response);
-            localStorage.setItem("email", response.data)
+            localStorage.setItem("email", response.data.role)
         })
-        if (localStorage.getItem('email') === 'root') navigate("/watch")
+        if (localStorage.getItem('email') === 'admin') navigate("/watch")
     }
     return (
         <div className={"flex justify-center mt-[3%]"}>

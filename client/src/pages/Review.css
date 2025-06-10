@@ -1,0 +1,151 @@
+/* Общие стили */
+.ql-container {
+    font-family: Arial, sans-serif;
+    color: #e5e7eb;
+    line-height: 1.6;
+}
+
+/* Заголовки */
+.ql-container h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+}
+
+.ql-container h2 {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: white;
+}
+
+.ql-container h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.ql-container h4 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: white;
+}
+
+.ql-container h5 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+}
+
+.ql-container h6 {
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* Форматирование текста */
+.ql-container strong {
+    font-weight: bold;
+}
+
+.ql-container em {
+    font-style: italic;
+}
+
+.ql-container u {
+    text-decoration: underline;
+}
+
+.ql-container s {
+    text-decoration: line-through;
+}
+
+/* Цитаты */
+.ql-container blockquote {
+    border-left: 4px solid gray;
+    padding-left: 10px;
+    font-style: italic;
+    color: lightgray;
+}
+
+/* Код */
+.ql-container pre {
+    background-color: #1f2937;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.ql-container code {
+    background-color: #2d3748;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #f3f4f6;
+}
+
+/* Списки */
+.ql-container ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.ql-container ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+
+/* Таблицы */
+.ql-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ql-container th,
+.ql-container td {
+    border: 1px solid #374151;
+    padding: 8px;
+    text-align: left;
+}
+
+.ql-container th {
+    background-color: #1f2937;
+    color: #f3f4f6;
+}
+
+/* Ссылки */
+.ql-container a {
+    color: #38bdf8;
+    text-decoration: underline;
+}
+
+.ql-container a:hover {
+    color: #60a5fa;
+}
+
+/* Изображения */
+.ql-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.ql-container {
+    background-color: #1d242b !important; /* Тёмный фон */
+    color: #e5e7eb; /* Светлый текст */
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* Тёмный фон для ввода текста */
+.ql-editor {
+    background-color: #283038 !important;
+    color: #f3f4f6;
+    min-height: auto;
+    border-radius: 5px;
+}
+
+/* Стили панели инструментов */
+.ql-toolbar {
+    background-color: #1d242b;
+    border-bottom: 1px solid #374151;
+}

@@ -9,14 +9,19 @@ function LoginForm() {
     useEffect(() => {
         if (localStorage.getItem("email")) navigate("/profile");
     }, []);
-    function buttonHandler(){
-        axios.post("http://localhost:5000/api/auth", {"email": email, "password": password}).then((response) => {
-            localStorage.setItem("email", response.data.электронная_почта);
-        });
-        if (localStorage.getItem("email")){
+    function buttonHandler(event) {
+        event.preventDefault();
+
+        axios.post("http://localhost:5000/api/auth", {"email": email, "password": password})
+          .then((response) => {
+            localStorage.setItem("email", response.data.email);
             navigate("/profile");
-        }
+          })
+          .catch((error) => {
+            console.error("Ошибка входа:", error);
+          });
     }
+
     return (
         <div className={"flex justify-center"}>
             <form className={"flex flex-col w-1/2 border-2 border-gray-500"}>
