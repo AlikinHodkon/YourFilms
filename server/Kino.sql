@@ -64,7 +64,7 @@ CREATE TABLE "Passwords" (
 );
 
 INSERT INTO "Users" ("first_name", "last_name", "email")
-VALUES ('Admin', 'Root', 'root');
+VALUES ('Admin', 'Root', 'admin');
 INSERT INTO "Passwords" ("user_id", "password")
 VALUES (1, 'root');
 

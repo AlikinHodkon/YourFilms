@@ -112,7 +112,7 @@ class UserController {
 
     async profile(req, res) {
         try {
-            const { email, id } = req.body;
+            const { email } = req.body;
             
             if (!email) {
                 return res.status(400).json({ error: "Email is required" });
@@ -127,8 +127,7 @@ class UserController {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            const { password, ...user } = userData.rows[0];
-            res.json(user);
+            res.json(userData.rows[0]);
 
         } catch (error) {
             console.error("Profile error:", error);

@@ -9,6 +9,7 @@ const router = express.Router();
 // Маршруты для фильмов
 router.get("/films", filmsController.getFilms);
 router.get("/films/:id", filmsController.getFilm);
+router.patch("/films/:id", filmsController.updateFilmField);
 router.post('/films', upload.single('image'), filmsController.addFilm);
 router.put("/films/:id", filmsController.updateFilm);
 router.delete("/films/:id", filmsController.deleteFilm);

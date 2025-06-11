@@ -108,6 +108,32 @@ class FilmsController {
         }
     }
 
+    async updateFilmField(req, res) {
+        try {
+            const { id } = req.params;
+            const { fieldName, value } = req.body;
+
+            // Валидация поля, которое можно обновлять
+            const allowedFields = ['title', 'rating', 'release_date'];
+            if (!allowedFields.includes(fieldName)) {
+            return res.status(400).json({ error: "Invalid field name" });
+            }
+
+            // Для даты преобразуем формат, если нужно
+            const dbValue = fieldName === 'release_date' ? value.replaceAll(".", "-") : value;
+
+            await db.query(
+            `UPDATE "Movies" SET "${fieldName}" = $1 WHERE "movie_id" = $2`,
+            [dbValue, id]
+            );
+
+            res.json({ message: "Field updated successfully" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
     async deleteFilm(req, res) {
         try {
             const id = req.params.id;
