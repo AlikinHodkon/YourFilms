@@ -26,5 +26,17 @@
   "indent_increase": "Increase Indent",
   "direction_rtl": "Right-to-Left",
   "align": "Align",
-  "clean": "Clear Formatting"
+  "clean": "Clear Formatting",
+  "watch": "Watch",
+  "home": "Home",
+  "profile": "Profile",
+  "exit": "Exit",
+  "email": "Email",
+  "password": "Password",
+  "login": "Log in",
+  "registration": "Registration",
+  "sortbygenre": "Sort by genre",
+  "sortbyname": "Sort by name",
+  "sortbydirector": "Sort by director",
+  "reset": "Reset"
 }

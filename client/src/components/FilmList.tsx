@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import Film from "./Film.tsx";
 import {IFilm} from "../types.ts";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 function FilmList() {
     const [films, setFilms] = useState<IFilm[]>([]);
@@ -14,6 +15,7 @@ function FilmList() {
     const [director, setDirector] = useState();
     const [form, setForm] = useState(false);
     const [image, setImage] = useState<File | null>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         axios.get("http://localhost:5000/api/films").then((response) => {
@@ -77,12 +79,12 @@ function FilmList() {
     return (
         <>
             <div className="flex justify-center">
-                <button onClick={() => setFilms([...films].sort((a, b) => a.genre_id - b.genre_id))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by genre</button>
-                <button onClick={() => setFilms([...films].sort((a, b) => a.title.localeCompare(b.title)))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by name</button>
-                <button onClick={() => setFilms([...films].sort((a, b) => a.director_id - b.director_id))} className="mr-2 border bg-orange-600 p-2 w-[10%]">Sort by director</button>
-                <button onClick={() => setFilms([...films].sort((a, b) => a.movie_id - b.movie_id))} className="border bg-orange-600 p-2 w-[10%]">Reset</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.genre_id - b.genre_id))} className="mr-2 border bg-orange-600 p-2 w-[10%]">{t("sortbygenre")}</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.title.localeCompare(b.title)))} className="mr-2 border bg-orange-600 p-2 w-[10%]">{t("sortbyname")}</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.director_id - b.director_id))} className="mr-2 border bg-orange-600 p-2 w-[10%]">{t("sortbydirector")}</button>
+                <button onClick={() => setFilms([...films].sort((a, b) => a.movie_id - b.movie_id))} className="border bg-orange-600 p-2 w-[10%]">{t("reset")}</button>
             </div>
-            <div className={"flex flex-wrap gap-4 p-4"}>
+            <div className={"flex flex-wrap gap-24 p-4"}>
                 {films.map((film: IFilm) => <Film key={film.movie_id} film={film} setFilms={setFilms}/>)}
                 <button onClick={showForm} className={`border-2 border-dotted border-orange-600 h-[60vh] w-[20vw] justify-center items-center mt-2 ${localStorage.getItem('email') === 'admin' ? "flex" : "hidden"}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}

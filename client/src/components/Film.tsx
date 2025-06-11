@@ -26,9 +26,6 @@ function Film(props: FilmProps) {
         });
     }
 
-    console.log(props.film.title);
-    
-
     return (
         <div onClick={handleClick} className={"border-2 mt-2 border-orange-600 rounded flex flex-col h-[60vh] w-[20vw] text-center relative"}>
             <div className={"h-[50vh]"}>

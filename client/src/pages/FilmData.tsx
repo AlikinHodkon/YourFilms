@@ -8,6 +8,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useTranslation } from "react-i18next";
 import "./Review.css";
+import EditableField from "../components/EditableField.tsx";
 
 function FilmData() {
     const { t } = useTranslation();
@@ -16,22 +17,30 @@ function FilmData() {
     const [userData, setUserData] = useState(null);
     const [text, setText] = useState("");
     const [rating, setRating] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
     const params = useParams();
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/reviews/${params.id}`).then((response) => {
-            setReviews(response.data);
-        });
-        axios.post("http://localhost:5000/api/profile", { email: localStorage.getItem("email") }).then((response) => {
-            setUserData(response.data);
-        });
-    }, []);
+        const fetchData = async () => {
+            try {
+                const [reviewsResponse, userResponse, filmResponse] = await Promise.all([
+                    axios.get(`http://localhost:5000/api/reviews/${params.id}`),
+                    axios.post("http://localhost:5000/api/profile", { email: localStorage.getItem("email") }),
+                    axios.get(`http://localhost:5000/api/films/${params.id}`)
+                ]);
 
-    useEffect(() => {
-        axios.get(`http://localhost:5000/api/films/${params.id}`).then((response) => {
-            setFilmData(response.data);
-        });
-    }, [reviews])
+                setReviews(reviewsResponse.data);
+                setUserData(userResponse.data);
+                setFilmData(filmResponse.data);
+                setIsLoading(false);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [params.id]);
 
     function handleClick() {
         axios.post("http://localhost:5000/api/reviews", {
@@ -49,7 +58,35 @@ function FilmData() {
         });
     }
 
-    if (!userData) return (<div>Loading</div>)
+    const handleFieldUpdate = async (fieldName: string, value: string, filmId: number) => {
+        try {
+            await axios.patch(
+                `http://localhost:5000/api/films/${filmId}`,
+                { fieldName: fieldName, value: value },
+                {
+                    headers: {
+                    'Content-Type': 'application/json',
+                    },
+                }
+            );
+            
+            setFilmData(() => ({...filmData, [fieldName]: value}))
+        } catch (error) {
+            console.error("Error updating field:", error);
+            throw error;
+        }
+    };
+
+    if (isLoading || !filmData) {
+        return (
+            <div className="bg-[#14181c] min-h-screen flex flex-col">
+                <Navbar />
+                <div className="flex justify-center items-center h-full text-white">
+                    Loading...
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-[#14181c] min-h-screen flex flex-col">
@@ -61,11 +98,24 @@ function FilmData() {
 
                 <div className="flex flex-col flex-grow">
                     <section className="flex flex-row justify-between w-[40vw] text-white text-center items-center">
-                        <h2 className="text-[24px]">{filmData?.title}</h2>
-                        <p className="text-[16px]">
-                            {filmData?.release_date ? `${t("release_date")}: ${new Date(filmData.release_date).toLocaleDateString("ru-RU")}` : ""}
+                        <EditableField 
+                            className="text-2xl" 
+                            fieldName="title" 
+                            value={filmData.title || ""} 
+                            onUpdate={handleFieldUpdate} 
+                            filmId={filmData.movie_id} 
+                        />
+                        <p className="text-[16px] flex">
+                            {t("release_date")}: 
+                            <EditableField 
+                                className="text-base" 
+                                fieldName="release_date" 
+                                value={filmData.release_date ? new Date(filmData.release_date).toLocaleDateString("ru-RU") : ""} 
+                                onUpdate={handleFieldUpdate} 
+                                filmId={filmData.movie_id} 
+                            />
                         </p>
-                        <p className="text-[16px]">{t("director")}: {filmData?.director_name}</p>
+                        <p className="text-[16px]">{t("director")}: {filmData.director_name}</p>
                     </section>
 
                     <div className="flex mt-2">
@@ -73,7 +123,6 @@ function FilmData() {
                     </div>
 
                     <hr className="bg-[#14181c] mt-5 mb-5"/>
-
 
                     <section className="flex text-2xl text-center w-100 text-white justify-between items-center">
                         <h2 className="ml-[5vw]">{t("rating")}</h2>

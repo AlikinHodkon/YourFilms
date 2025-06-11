@@ -1,14 +1,39 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { i18n, t } = useTranslation();
+    const { t, i18n } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
 
   function handleClick() {
     localStorage.removeItem("email");
     navigate("/");
   }
+
+  const handleLanguageChange = (lng: string) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem("i18nextLng", lng )
+    setCurrentLanguage(lng);
+  };
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('i18nextLng');
+    if (savedLanguage) {
+      i18n.changeLanguage(savedLanguage);
+      setCurrentLanguage(savedLanguage);
+    }
+
+    const handleStorageChange = (event: {key: string, newValue: string}) => {
+      if (event.key === 'i18nextLng') {
+        setCurrentLanguage(event.newValue);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [i18n]);
 
   return (
     <div className="bg-black text-white h-10">
@@ -33,10 +58,16 @@ export default function Navbar() {
           >
             {t("exit")}
           </li>
-          <select className="bg-black text-white">
-            <option onClick={() => i18n.changeLanguage("ru")} className="hover:text-orange-600">🇷🇺 Русский</option>
-            <option onClick={() => i18n.changeLanguage("en")} className="hover:text-orange-600">🇬🇧 English</option>
-          </select>
+          <li>
+            <select 
+              className="bg-black text-white"
+              value={currentLanguage}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+            >
+              <option value="ru" className="hover:text-orange-600">🇷🇺 Русский</option>
+              <option value="en" className="hover:text-orange-600">🇬🇧 English</option>
+            </select>
+          </li>
         </ul>
       </div>
     </div>

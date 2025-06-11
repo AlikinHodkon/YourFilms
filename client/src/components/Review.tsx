@@ -35,7 +35,7 @@ function Review({ review, setReviews, userData }: ReviewProps) {
                     <h3>{review.rating}</h3>
                 </div>
             </div>
-            <button className={`${localStorage.getItem("email") === "admin" || userData.user_id === review.user_id ? "block" : "hidden"}`} onClick={handleButton}>
+            <button className={`${localStorage.getItem("email") === "admin" || userData?.user_id === review.user_id ? "block" : "hidden"}`} onClick={handleButton}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
