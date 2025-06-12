@@ -75,12 +75,19 @@ export default function Genres() {
     setDescription(genre.description);
   }
 
-  function updateGenre() { // 🔹 Добавлено
+  function updateGenre() {
     if (!editingGenre) return;
 
-    axios.put(`http://localhost:5000/api/genres/${editingGenre.genre_id}`, { name, description}, { withCredentials: true })
+    axios
+      .put(
+        `http://localhost:5000/api/genres/${editingGenre.genre_id}`,
+        { name, description },
+        { withCredentials: true }
+      )
       .then(() => {
         setEditingGenre(null);
+        setName("");           // ✅ очищаем название
+        setDescription("");    // ✅ очищаем описание
         fetchGenres();
       });
   }

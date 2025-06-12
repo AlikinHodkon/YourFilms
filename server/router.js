@@ -44,6 +44,7 @@ router.delete("/directors/:id", checkAdmin, directorsController.deleteDirector);
 // 🔹 Маршруты для пользователей (✅ Без проверки админа)
 router.get("/watch/:id", userController.getWatch);
 router.post("/profile", userController.profile);
+router.patch("/profile", userController.editProfile);
 router.post("/auth", userController.login);
 router.post("/admin", userController.adminLogin);
 router.post("/registration", userController.registration);

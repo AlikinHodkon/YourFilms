@@ -21,10 +21,19 @@ function FilmData() {
     const params = useParams();
     const [image, setImage] = useState<File | null>(null);
      const [isAdmin, setIsAdmin] = useState(false);
+     const [genres, setGenres] = useState([]);
+     const [directors, setDirectors] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+
+         const [genreResponse, directorResponse] = await Promise.all([
+             axios.get("http://localhost:5000/api/genres"),
+             axios.get("http://localhost:5000/api/directors")
+         ]);
+         setGenres(genreResponse.data);
+         setDirectors(directorResponse.data);
                  axios
                 .get("http://localhost:5000/api/admin-status", { withCredentials: true })
                 .then((response) => {
@@ -126,6 +135,26 @@ function FilmData() {
         );
     }
 
+    async function handleFilmSave() {
+      try {
+        await axios.put(`http://localhost:5000/api/films/${filmData.movie_id}`, {
+          title: filmData.title,
+          genre_id: filmData.genre_id,
+          release_date: filmData.release_date,
+          director_id: filmData.director_id,
+          rating: filmData.rating,
+        }, {
+          withCredentials: true
+        });
+
+        alert("Фильм успешно обновлён");
+      } catch (error) {
+        console.error("Ошибка при обновлении фильма:", error);
+        alert("Ошибка обновления");
+      }
+    }
+
+
     return (
         <div className="bg-[#14181c] min-h-screen flex flex-col">
             <Navbar />
@@ -175,10 +204,80 @@ function FilmData() {
                             />
                         </p>
                         <p className="text-[16px]">{t("director")}: {filmData.director_name}</p>
+                        {isAdmin && (
+                        <select
+                          className="bg-[#1d242b] ml-2 rounded text-white px-2"
+                          value={filmData.director_id}
+                          onChange={async (e) => {
+                            const newDirectorId = parseInt(e.target.value);
+                            const newDirector = directors.find(d => d.director_id === newDirectorId);
+                            setFilmData((prev) => ({
+                              ...prev,
+                              director_id: newDirectorId,
+                              director_name: newDirector
+                                ? `${newDirector.first_name} ${newDirector.last_name}`
+                                : prev.director_name,
+                            }));
+
+                            try {
+                              await axios.put(`http://localhost:5000/api/films/${filmData.movie_id}`, {
+                                title: filmData.title,
+                                genre_id: filmData.genre_id,
+                                release_date: filmData.release_date,
+                                director_id: newDirectorId,
+                                rating: filmData.rating,
+                              }, { withCredentials: true });
+                            } catch (err) {
+                              console.error("Ошибка при обновлении режиссёра:", err);
+                            }
+                          }}
+                        >
+                          {directors.map((d) => (
+                            <option key={d.director_id} value={d.director_id}>
+                              {d.first_name} {d.last_name}
+                            </option>
+                          ))}
+                        </select>)}
+
                     </section>
 
                     <div className="flex mt-2">
                         <p className="bg-[#283038] rounded p-1 text-[#8a9aa9]">{t("genre")}: {filmData?.genre_name}</p>
+                        {isAdmin && (
+                            <select
+                              className="bg-[#1d242b] ml-2 rounded text-white px-2"
+                              value={filmData.genre_id}
+                              onChange={async (e) => {
+                                const newGenreId = parseInt(e.target.value);
+                                  const newGenre = genres.find(g => g.genre_id === newGenreId);
+
+                                  // Обновляем локально genre_id + genre_name
+                                  setFilmData((prev) => ({
+                                    ...prev,
+                                    genre_id: newGenreId,
+                                    genre_name: newGenre ? newGenre.name : prev.genre_name,
+                                  }));
+
+                                try {
+                                  await axios.put(`http://localhost:5000/api/films/${filmData.movie_id}`, {
+                                    title: filmData.title,
+                                    genre_id: newGenreId,
+                                    release_date: filmData.release_date,
+                                    director_id: filmData.director_id,
+                                    rating: filmData.rating,
+                                  }, { withCredentials: true });
+                                } catch (err) {
+                                  console.error("Ошибка при обновлении жанра:", err);
+                                }
+                              }}
+                            >
+                              {genres.map((g) => (
+                                <option key={g.genre_id} value={g.genre_id}>
+                                  {g.name}
+                                </option>
+                              ))}
+                            </select>
+                          )}
                     </div>
 
                     <hr className="bg-[#14181c] mt-5 mb-5"/>

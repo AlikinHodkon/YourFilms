@@ -67,9 +67,14 @@ export default function Directors() {
       biography
     }).then(() => {
       setEditingDirector(null);
+      setFirstName("");       // очистка полей
+      setLastName("");
+      setBirthDate("");
+      setBiography("");
       fetchDirectors();
     });
   }
+
 
   return (
     <div className="bg-[#14181c] min-h-screen flex flex-col">

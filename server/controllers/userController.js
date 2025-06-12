@@ -130,6 +130,35 @@ class UserController {
         }
     }
 
+    async editProfile(req, res) {
+        try {
+            const { email, first_name, last_name } = req.body;
+
+            if (!email || !first_name || !last_name) {
+                return res.status(400).json({ error: "All fields are required" });
+            }
+
+            const updatedUser = await db.query(
+                `UPDATE "Users"
+                 SET "first_name" = $1,
+                     "last_name" = $2
+                 WHERE "email" = $3
+                 RETURNING "user_id", "first_name", "last_name", "email", "registration_date"`,
+                [first_name, last_name, email]
+            );
+
+            if (updatedUser.rows.length === 0) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            res.status(200).json(updatedUser.rows[0]);
+        } catch (error) {
+            console.error("Edit profile error:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+
     async profile(req, res) {
         try {
             const { email } = req.body;
@@ -165,7 +194,7 @@ class UserController {
                 return res.status(400).json({ error: "Email and movie ID are required" });
             }
 
-            // Get user
+            // Получаем пользователя
             const userData = await db.query(
                 'SELECT "user_id" FROM "Users" WHERE "email" = $1',
                 [email]
@@ -175,21 +204,30 @@ class UserController {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            // Record watch history
+            const user_id = userData.rows[0].user_id;
+
+            // Удаляем предыдущие просмотры этого фильма для пользователя
             await db.query(
-                `INSERT INTO "WatchHistory"
-                ("user_id", "movie_id", "watch_date", "watch_time")
-                VALUES ($1, $2, CURRENT_DATE, CURRENT_TIME)`,
-                [userData.rows[0].user_id, movie_id]
+                'DELETE FROM "WatchHistory" WHERE "user_id" = $1 AND "movie_id" = $2',
+                [user_id, movie_id]
             );
 
-            res.status(201).json({ message: "Watch history recorded" });
+            // Добавляем новый просмотр
+            await db.query(
+                `INSERT INTO "WatchHistory"
+                 ("user_id", "movie_id", "watch_date", "watch_time")
+                 VALUES ($1, $2, CURRENT_DATE, CURRENT_TIME)`,
+                [user_id, movie_id]
+            );
+
+            res.status(201).json({ message: "Watch history recorded (unique per movie/user)" });
 
         } catch (error) {
             console.error("Add watch error:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     }
+
 
     async getWatch(req, res) {
         try {

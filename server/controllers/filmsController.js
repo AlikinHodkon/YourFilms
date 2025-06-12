@@ -80,15 +80,26 @@ class FilmsController {
     async addFilm(req, res) {
         try {
             const { name, date, rating, genre, director } = req.body;
-            const image = req.file;
+            const imageName = req.file ? req.file.filename : null; // ✅ Сохраняем только имя файла
 
             const id_genre = await db.query(`SELECT "genre_id" FROM "Genre" WHERE "name" = $1`, [genre]);
-            const id_director = await db.query(`SELECT "director_id" FROM "Directors" WHERE "first_name" = $1 AND "last_name" = $2`, [director.split(" ")[0], director.split(" ")[1]]);
+            const id_director = await db.query(
+                `SELECT "director_id" FROM "Directors" WHERE "first_name" = $1 AND "last_name" = $2`,
+                [director.split(" ")[0], director.split(" ")[1]]
+            );
+
             const newDate = date.replaceAll(".", "-");
-            await db.query(`INSERT INTO "Movies" ("title", "genre_id", "release_date", "director_id", "rating") VALUES ($1, $2, $3, $4, $5)`, [name, id_genre.rows[0].genre_id, newDate, id_director.rows[0].director_id, rating]);
-            res.json({ message: "Film added successfully" });
+
+            await db.query(
+                `INSERT INTO "Movies" ("title", "genre_id", "release_date", "director_id", "rating", "image")
+                 VALUES ($1, $2, $3, $4, $5, $6)`,
+                [name, id_genre.rows[0].genre_id, newDate, id_director.rows[0].director_id, rating, imageName]
+            );
+
+            res.json({ message: "Film added successfully", image: imageName });
+
         } catch (error) {
-            console.error(error);
+            console.error("Add film error:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     }
@@ -122,13 +133,31 @@ class FilmsController {
     async deleteFilm(req, res) {
         try {
             const id = req.params.id;
+
+            // Получаем имя файла изображения
+            const imageData = await db.query(`SELECT "image" FROM "Movies" WHERE "movie_id" = $1`, [id]);
+            const imageName = imageData.rows[0]?.image;
+
+            // Удаляем файл изображения, если он есть
+            if (imageName) {
+                const imagePath = path.join(uploadDir, imageName);
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                    console.log(`Удалено изображение: ${imagePath}`);
+                }
+            }
+
+            // Удаляем сам фильм
             await admin.query('DELETE FROM "Movies" WHERE "movie_id" = $1', [id]);
-            res.json({ message: "Film deleted successfully" });
+
+            res.json({ message: "Film and image deleted successfully" });
+
         } catch (error) {
-            console.error(error);
+            console.error("Error deleting film:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     }
+
 
     async getReviews(req, res) {
         try {
