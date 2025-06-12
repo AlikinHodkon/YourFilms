@@ -18,12 +18,21 @@ function Film(props: FilmProps) {
         navigate(`/watch/${props.film.movie_id}`);
     }
 
+
+
     async function deleteFilm(e) {
         e.stopPropagation();
-        await axios.delete(`http://localhost:5000/api/films/${props.film.movie_id}`);
-        await axios.get("http://localhost:5000/api/films").then((response) => {
-            props.setFilms(response.data);
-        });
+
+        try {
+            await axios.delete(`http://localhost:5000/api/films/${props.film.movie_id}`, { withCredentials: true }); // ✅ Cookie передаются
+
+            await axios.get("http://localhost:5000/api/films", { withCredentials: true }) // ✅ Cookie передаются
+            .then((response) => {
+                props.setFilms(response.data);
+            });
+        } catch (error) {
+            console.error("Ошибка удаления фильма:", error);
+        }
     }
 
     return (

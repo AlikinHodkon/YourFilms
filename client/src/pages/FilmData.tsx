@@ -19,15 +19,32 @@ function FilmData() {
     const [rating, setRating] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
     const params = useParams();
+    const [image, setImage] = useState<File | null>(null);
+     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                 axios
+                .get("http://localhost:5000/api/admin-status", { withCredentials: true })
+                .then((response) => {
+                  setIsAdmin(response.data.isAdmin);
+                })
+                .catch(() => {
+                  setIsAdmin(false);
+                });
                 const [reviewsResponse, userResponse, filmResponse] = await Promise.all([
                     axios.get(`http://localhost:5000/api/reviews/${params.id}`),
                     axios.post("http://localhost:5000/api/profile", { email: localStorage.getItem("email") }),
                     axios.get(`http://localhost:5000/api/films/${params.id}`)
                 ]);
+
+                if (userResponse.data?.email && filmResponse.data?.movie_id) {
+                    await axios.post("http://localhost:5000/api/watch", {
+                        email: userResponse.data.email,
+                        movie_id: filmResponse.data.movie_id
+                    });
+                }
 
                 setReviews(reviewsResponse.data);
                 setUserData(userResponse.data);
@@ -41,6 +58,27 @@ function FilmData() {
 
         fetchData();
     }, [params.id]);
+
+
+    function handleImageUpload(event) { // 🔹 Загрузка изображения
+        const file = event.target.files[0];
+        setImage(file);
+    }
+
+    function handleImageSubmit() { // 🔹 Отправка изображения
+        if (!image) return;
+
+        const formData = new FormData();
+        formData.append("image", image);
+
+        axios.post(`http://localhost:5000/api/films/${params.id}/upload`, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        }).then(() => {
+            axios.get(`http://localhost:5000/api/films/${params.id}`).then((response) => {
+                setFilmData(response.data);
+            });
+        });
+    }
 
     function handleClick() {
         axios.post("http://localhost:5000/api/reviews", {
@@ -69,7 +107,7 @@ function FilmData() {
                     },
                 }
             );
-            
+
             setFilmData(() => ({...filmData, [fieldName]: value}))
         } catch (error) {
             console.error("Error updating field:", error);
@@ -92,27 +130,48 @@ function FilmData() {
         <div className="bg-[#14181c] min-h-screen flex flex-col">
             <Navbar />
             <div className="flex justify-center text-[#8a9aa9] pt-[2vh] flex-grow gap-4">
+
                 <div className="h-[50vh] w-[15vw] flex flex-col items-center justify-center">
-                    <img className="h-[50vh] rounded border-2 w-[15vw]" src={`http://localhost:5000/images/${filmData?.image}`} alt={t("film_title")} />
+                  <img
+                    className="h-[50vh] rounded border-2 w-[15vw]"
+                    src={`http://localhost:5000/images/${filmData?.image}`}
+                    alt={t("film_title")}
+                  />
+                  {isAdmin && (
+                    <div className="flex flex-col items-center">
+                      <input
+                        type="file"
+                        onChange={handleImageUpload}
+                        className="mt-2 text-white"
+                      />
+                      <button
+                        onClick={handleImageSubmit}
+                        className="bg-blue-500 text-white rounded p-2 mt-2"
+                      >
+                        Загрузить картинку
+                      </button>
+                    </div>
+                  )}
                 </div>
+
 
                 <div className="flex flex-col flex-grow">
                     <section className="flex flex-row justify-between w-[40vw] text-white text-center items-center">
-                        <EditableField 
-                            className="text-2xl" 
-                            fieldName="title" 
-                            value={filmData.title || ""} 
-                            onUpdate={handleFieldUpdate} 
-                            filmId={filmData.movie_id} 
+                        <EditableField
+                            className="text-2xl"
+                            fieldName="title"
+                            value={filmData.title || ""}
+                            onUpdate={handleFieldUpdate}
+                            filmId={filmData.movie_id}
                         />
                         <p className="text-[16px] flex">
-                            {t("release_date")}: 
-                            <EditableField 
-                                className="text-base" 
-                                fieldName="release_date" 
-                                value={filmData.release_date ? new Date(filmData.release_date).toLocaleDateString("ru-RU") : ""} 
-                                onUpdate={handleFieldUpdate} 
-                                filmId={filmData.movie_id} 
+                            {t("release_date")}:
+                            <EditableField
+                                className="text-base"
+                                fieldName="release_date"
+                                value={filmData.release_date ? new Date(filmData.release_date).toLocaleDateString("ru-RU") : ""}
+                                onUpdate={handleFieldUpdate}
+                                filmId={filmData.movie_id}
                             />
                         </p>
                         <p className="text-[16px]">{t("director")}: {filmData.director_name}</p>

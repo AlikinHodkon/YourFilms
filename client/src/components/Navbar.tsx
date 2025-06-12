@@ -1,15 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import axios from "axios";
+
 
 export default function Navbar() {
   const navigate = useNavigate();
     const { t, i18n } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  const [isAdmin, setIsAdmin] = useState(false); // ✅ Убираем localStorage
+
+  // ✅ Проверка статуса админа при загрузке Navbar
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/admin-status", { withCredentials: true })
+    .then((response) => {
+      setIsAdmin(response.data.isAdmin); // ✅ Обновляем состояние
+    })
+    .catch(() => {
+      setIsAdmin(false);
+    });
+  }, []);
 
   function handleClick() {
-    localStorage.removeItem("email");
-    navigate("/");
+    axios.post("http://localhost:5000/api/logout", {}, { withCredentials: true })
+    .then(() => {
+      localStorage.removeItem("email");
+      setIsAdmin(false); // ✅ Очистка состояния админа
+      navigate("/");
+    })
+    .catch(err => console.error("Ошибка выхода:", err));
   }
 
   const handleLanguageChange = (lng: string) => {
@@ -41,12 +60,12 @@ export default function Navbar() {
         <ul className="flex justify-between w-1/2 h-full items-center">
           <li className="hover:text-orange-600"><a href="/">{t("home")}</a></li>
           <li className="hover:text-orange-600"><a href="/watch">{t("watch")}</a></li>
-          {localStorage.getItem("email") === "admin" && 
+          {isAdmin &&
             (
               <li className="hover:text-orange-600"><a href="/genres">{t("genres")}</a></li>
             )
           }
-          {localStorage.getItem("email") === "admin" && 
+          {isAdmin &&
             (
               <li className="hover:text-orange-600"><a href="/directors">{t("directors")}</a></li>
             )
@@ -59,7 +78,7 @@ export default function Navbar() {
             {t("exit")}
           </li>
           <li>
-            <select 
+            <select
               className="bg-black text-white"
               value={currentLanguage}
               onChange={(e) => handleLanguageChange(e.target.value)}

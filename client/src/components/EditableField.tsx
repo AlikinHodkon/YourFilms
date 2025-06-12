@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import axios from "axios";
 
 type EditableFieldProps = {
   className?: string;
@@ -20,7 +21,17 @@ export default function EditableField({
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+    const [isAdmin, setIsAdmin] = useState(false);
+
   useEffect(() => {
+      axios
+        .get("http://localhost:5000/api/admin-status", { withCredentials: true })
+        .then((response) => {
+          setIsAdmin(response.data.isAdmin);
+        })
+        .catch(() => {
+          setIsAdmin(false);
+        });
     if (isEdit && inputRef.current) {
       inputRef.current.focus();
     }
@@ -71,7 +82,8 @@ export default function EditableField({
         <p className={className}>{fieldValue}</p>
       )}
 
-      {isEdit ? (
+    {isAdmin && (
+      isEdit ? (
         <div className="flex gap-1">
           <button
             onClick={handleSave}
@@ -138,7 +150,8 @@ export default function EditableField({
             />
           </svg>
         </button>
-      )}
+      )
+    )}
     </div>
   );
 }

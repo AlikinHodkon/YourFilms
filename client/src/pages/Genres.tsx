@@ -1,18 +1,36 @@
 import Navbar from "../components/Navbar.tsx";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 export default function Genres() {
   const [genres, setGenres] = useState([]);
-  const [filteredGenres, setFilteredGenres] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredGenres, setFilteredGenres] = useState([]); // 🔹 Добавлено для поиска
+  const [searchQuery, setSearchQuery] = useState(""); // 🔹 Поле поиска
   const [editingGenre, setEditingGenre] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
+    const navigate = useNavigate();
   useEffect(() => {
+      checkAdminStatus();
     fetchGenres();
   }, []);
+
+    function checkAdminStatus() {
+      axios.get("http://localhost:5000/api/admin-status", {
+         withCredentials: true// ✅ Передаём email в заголовке
+      })
+      .then((response) => {
+        if (!response.data.isAdmin) {
+          navigate("/login"); // ✅ Перенаправление
+        } else {
+          fetchGenres(); // Загружаем жанры только для админа
+        }
+      })
+      .catch(() => navigate("/login")); // ✅ Если ошибка, перекидываем
+    }
+
 
   function fetchGenres() {
     axios.get("http://localhost:5000/api/genres")
@@ -38,20 +56,29 @@ export default function Genres() {
   }
 
   function deleteGenre(id: number) {
-    axios.delete(`http://localhost:5000/api/genres/${id}`)
-      .then(fetchGenres);
+    axios.delete(`http://localhost:5000/api/genres/${id}`).then(() => {
+      // Если удаляемый жанр был в режиме редактирования, сбросить форму
+      if (editingGenre && editingGenre.genre_id === id) {
+        setEditingGenre(null);
+        setName("");
+        setDescription("");
+      }
+
+      fetchGenres();
+    });
   }
 
-  function startEditing(genre) {
+
+  function startEditing(genre) { // 🔹 Добавлено
     setEditingGenre(genre);
     setName(genre.name);
     setDescription(genre.description);
   }
 
-  function updateGenre() {
+  function updateGenre() { // 🔹 Добавлено
     if (!editingGenre) return;
 
-    axios.put(`http://localhost:5000/api/genres/${editingGenre.genre_id}`, { name, description })
+    axios.put(`http://localhost:5000/api/genres/${editingGenre.genre_id}`, { name, description}, { withCredentials: true })
       .then(() => {
         setEditingGenre(null);
         fetchGenres();
@@ -60,11 +87,12 @@ export default function Genres() {
 
   return (
     <div className="bg-[#14181c] min-h-screen flex flex-col">
-      <Navbar />
+      <Navbar /> {/* 🔹 Добавлен Navbar */}
 
       <div className="flex flex-col items-center text-white p-5">
         <h2 className="text-2xl font-bold">Жанры</h2>
 
+        {/* 🔹 Поле поиска */}
         <input
           type="text"
           placeholder="Поиск по названию..."
@@ -74,7 +102,7 @@ export default function Genres() {
         />
 
         <ul className="space-y-4 w-1/2 mt-4">
-          {filteredGenres.map((genre) => (
+          {filteredGenres.map((genre) => ( // 🔹 Используем `filteredGenres`
             <li key={genre.genre_id} className="bg-[#283038] p-3 rounded text-white">
               <p className="font-bold">{genre.name}</p>
               <p className="text-[#8a9aa9] mt-1">{genre.description}</p>

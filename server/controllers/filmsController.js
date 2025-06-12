@@ -1,12 +1,13 @@
 const db = require("../db");
 const admin = require("../admin");
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const multer = require("multer"); // 🔹 Для обработки файлов
+const fs = require("fs"); // ✅ Добавлено для работы с файлами
+const path = require("path"); // ✅ Для корректной обработки путей
 
+// Настраиваем хранилище изображений
 const uploadDir = path.join(__dirname, "../public/images/");
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+    fs.mkdirSync(uploadDir, { recursive: true }); // ✅ Создаем папку, если ее нет
 }
 
 const storage = multer.diskStorage({
@@ -25,11 +26,13 @@ class FilmsController {
             const id = req.params.id;
             const { title, genre_id, release_date, director_id, rating } = req.body;
 
+            // Проверяем, существует ли фильм
             const filmExists = await db.query(`SELECT * FROM "Movies" WHERE "movie_id" = $1`, [id]);
             if (filmExists.rows.length === 0) {
                 return res.status(404).json({ error: "Film not found" });
             }
 
+            // Обновляем данные фильма
             await db.query(`
                 UPDATE "Movies"
                 SET "title" = $1, "genre_id" = $2, "release_date" = $3, "director_id" = $4, "rating" = $5
@@ -80,27 +83,9 @@ class FilmsController {
             const image = req.file;
 
             const id_genre = await db.query(`SELECT "genre_id" FROM "Genre" WHERE "name" = $1`, [genre]);
-            const [firstName, lastName] = director.split(" ");
-            const id_director = await db.query(
-                `SELECT "director_id" FROM "Directors" WHERE "first_name" = $1 AND "last_name" = $2`, 
-                [firstName, lastName]
-            );
-
+            const id_director = await db.query(`SELECT "director_id" FROM "Directors" WHERE "first_name" = $1 AND "last_name" = $2`, [director.split(" ")[0], director.split(" ")[1]]);
             const newDate = date.replaceAll(".", "-");
-            
-            await db.query(
-                `INSERT INTO "Movies" ("title", "genre_id", "release_date", "director_id", "rating", "image") 
-                VALUES ($1, $2, $3, $4, $5, $6)`, 
-                [
-                    name, 
-                    id_genre.rows[0].genre_id, 
-                    newDate, 
-                    id_director.rows[0].director_id, 
-                    rating,
-                    image ? image.filename : null
-                ]
-            );
-
+            await db.query(`INSERT INTO "Movies" ("title", "genre_id", "release_date", "director_id", "rating") VALUES ($1, $2, $3, $4, $5)`, [name, id_genre.rows[0].genre_id, newDate, id_director.rows[0].director_id, rating]);
             res.json({ message: "Film added successfully" });
         } catch (error) {
             console.error(error);
@@ -204,9 +189,37 @@ class FilmsController {
             res.status(500).json({ error: "Internal server error" });
         }
     }
+
+    async uploadImage(req, res) {
+        try {
+            const id = req.params.id;
+            const imagePath = req.file.filename;
+
+            // Проверяем, есть ли у фильма старое изображение
+            const oldImage = await db.query(`SELECT "image" FROM "Movies" WHERE "movie_id" = $1`, [id]);
+
+            // Удаляем старый файл (если он есть)
+            if (oldImage.rows[0]?.image) {
+                const filePath = path.join(uploadDir, oldImage.rows[0].image);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                    console.log(`Удалено старое изображение: ${filePath}`);
+                }
+            }
+
+            // Обновляем изображение фильма в базе данных
+            await db.query(`UPDATE "Movies" SET "image" = $1 WHERE "movie_id" = $2`, [imagePath, id]);
+
+            res.json({ message: "Image uploaded successfully", image: imagePath });
+
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            res.status(500).json({ error: "Error uploading image" });
+        }
+    }
 }
 
 module.exports = {
-    filmsController: new FilmsController(),
-    upload
+    filmsController: new FilmsController(), // ✅ Экспорт класса
+    upload // ✅ Экспорт `multer`
 };

@@ -15,7 +15,7 @@ function Profile() {
         }).then((response) => {
             setUserData(response.data);
             axios.get(`http://localhost:5000/api/watch/${response.data.user_id}`).then((response) => {
-                setWatchData(response.data.rows);
+                setWatchData(response.data);
             });
         });
     }, []);
@@ -36,11 +36,6 @@ function Profile() {
                     </div>
                 </div>
                 <div className="flex flex-col w-3/4 ml-5 mr-5">
-                    <div className="bg-white w-full p-5 flex flex-col h-[47.5vh] rounded-xl text-[32px]">
-                        <h1 className="text-center text-[40px]"></h1>
-                        <p className="mt-5"></p>
-                        <p className="mt-20"></p>
-                    </div>
                     <div className="bg-white w-full mt-5 p-5 flex flex-col justify-between h-[47.5vh] rounded-xl text-[32px]">
                         <h1 className="text-center text-[40px]"></h1>
                         <div className={`flex justify-between ml-5 mr-5`}>

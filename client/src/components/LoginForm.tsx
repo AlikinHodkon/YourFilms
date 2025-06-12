@@ -14,7 +14,10 @@ function LoginForm() {
     function buttonHandler(event) {
         event.preventDefault();
 
-        axios.post("http://localhost:5000/api/auth", {"email": email, "password": password})
+        axios.post("http://localhost:5000/api/auth", { email, password }, {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true
+        })
           .then((response) => {
             localStorage.setItem("email", response.data.email);
             navigate("/profile");

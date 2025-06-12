@@ -1,0 +1,13 @@
+module.exports = (req, res, next) => {
+    const userEmail = req.session?.email; // ✅ Берём email из сессии
+
+    if (!userEmail) {
+        return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    if (userEmail !== "admin") { // ✅ Проверяем, админ ли пользователь
+        return res.status(403).json({ error: "Access denied: Admin only" });
+    }
+
+    next(); // ✅ Всё нормально — продолжаем выполнение запроса
+};
