@@ -94,21 +94,21 @@ function FilmList() {
                 </button>
                 <form className={`${form ? "flex" : "hidden"} flex-col p-2 w-1/4 h-1/2 justify-between fixed transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 bg-white border-2 border-orange-600`}>
                     <div className={"flex flex-col"}>
-                        <label>Name</label>
+                        <label>{t("name")}</label>
                         <input onChange={handleInput} name={"name"} className={"border-2"} type={"text"} required />
                     </div>
                     <div className={"flex flex-col"}>
-                        <label>Release Date</label>
+                        <label>{t("release_date")}</label>
                         <input onChange={handleInput} name={"date"} className={"border-2"} type={"date"} required />
                     </div>
                     <div className={"flex flex-col"}>
-                        <label>Rating</label>
+                        <label>{t("rating")}</label>
                         <select onChange={handleInput} name={"rating"} className={"border-2"}>
                             {[1,2,3,4,5,6,7,8,9,10].map(num => <option key={num}>{num}</option>)}
                         </select>
                     </div>
                     <div className={"flex flex-col"}>
-                        <label>Director</label>
+                        <label>{t("director")}</label>
                         <select name={"director"} onChange={handleInput} className={"border-2"}>
                             {directors.map((director) => (
                                 <option key={director.director_id}>
@@ -118,7 +118,7 @@ function FilmList() {
                         </select>
                     </div>
                     <div className={"flex flex-col"}>
-                        <label>Genre</label>
+                        <label>{t("genre")}</label>
                         <select name={"genre"} onChange={handleInput} className={"border-2"}>
                             {genres.map((genre) => (
                                 <option key={genre.genre_id}>{genre.name}</option>
@@ -126,10 +126,10 @@ function FilmList() {
                         </select>
                     </div>
                     <div>
-                        <input type="file" onChange={handleImageUpload} className="mt-2 text-white" />
+                        <input type="file" onChange={handleImageUpload} className="mt-2 text-black" />
                     </div>
-                    <button onClick={addFilm} className={"bg-orange-600 text-white rounded"}>Add</button>
-                    <button onClick={() => setForm(false)} className="border border-orange-600">Close</button>
+                    <button onClick={addFilm} className={"bg-orange-600 text-white rounded"}>{t("add")}</button>
+                    <button onClick={() => setForm(false)} className="border border-orange-600">{t("close")}</button>
                 </form>
             </div>
         </>

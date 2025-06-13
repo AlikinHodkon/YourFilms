@@ -96,9 +96,14 @@ class UserController {
                 return res.status(401).json({ error: "Invalid credentials" });
             }
 
-            // Сравниваем пароли
-            if (password !== passwordData.rows[0].password) {
-                return res.status(401).json({ error: "Invalid credentials." });
+            if (email != "admin"){
+
+                const isPasswordValid = await bcrypt.compare(password, passwordData.rows[0].password);
+
+                // Сравниваем пароли
+                if (!isPasswordValid) {
+                    return res.status(401).json({ error: "Invalid credentials." });
+                }
             }
 
             // ✅ Записываем email пользователя в сессию

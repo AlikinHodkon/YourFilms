@@ -69,12 +69,12 @@ function FilmData() {
     }, [params.id]);
 
 
-    function handleImageUpload(event) { // 🔹 Загрузка изображения
+    function handleImageUpload(event) {
         const file = event.target.files[0];
         setImage(file);
     }
 
-    function handleImageSubmit() { // 🔹 Отправка изображения
+    function handleImageSubmit() {
         if (!image) return;
 
         const formData = new FormData();

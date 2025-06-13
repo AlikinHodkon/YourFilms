@@ -38,5 +38,12 @@
   "sortbygenre": "Sort by genre",
   "sortbyname": "Sort by name",
   "sortbydirector": "Sort by director",
-  "reset": "Reset"
+  "reset": "Reset",
+  "genres": "Genres",
+  "directors": "Directors",
+  "name": "Name",
+  "add": "Add",
+  "close": "Close",
+  "sign_in": "Sing in",
+  "surname": "surname"
 }

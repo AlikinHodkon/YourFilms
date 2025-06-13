@@ -14,7 +14,7 @@ export default function Navbar() {
   useEffect(() => {
     axios.get("http://localhost:5000/api/admin-status", { withCredentials: true })
     .then((response) => {
-      setIsAdmin(response.data.isAdmin); // ✅ Обновляем состояние
+      setIsAdmin(response.data.isAdmin)
     })
     .catch(() => {
       setIsAdmin(false);
@@ -25,7 +25,7 @@ export default function Navbar() {
     axios.post("http://localhost:5000/api/logout", {}, { withCredentials: true })
     .then(() => {
       localStorage.removeItem("email");
-      setIsAdmin(false); // ✅ Очистка состояния админа
+      setIsAdmin(false);
       navigate("/");
     })
     .catch(err => console.error("Ошибка выхода:", err));
